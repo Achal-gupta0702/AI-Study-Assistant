@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tutor — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <style>
+    body { overflow: hidden; }
+    .main-wrapper { height: 100vh; overflow: hidden; }
+    .chat-history-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #94a3b8; transition: all .15s; display: flex; align-items: center; gap: 8px; }
+    .chat-history-item:hover, .chat-history-item.active { background: rgba(255,255,255,.06); color: #e2e8f0; }
+    .suggested-chip { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 99px; font-size: 12px; cursor: pointer; color: #475569; transition: all .15s; white-space: nowrap; }
+    .suggested-chip:hover { background: #e0e7ff; border-color: #c7d2fe; color: #4f46e5; }
+  </style>
+</head>
+<body>
+<div id="sidebarMount"></div>
+<div class="main-wrapper">
+  <div id="navbarMount"></div>
+  <div class="chat-wrapper">
+    <!-- Chat Sidebar -->
+    <div class="chat-sidebar" style="background:#0f172a">
+      <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,.08)">
+        <button class="btn-primary w-100 justify-content-center" onclick="newChat()" style="padding:10px">
+          <i class="fas fa-plus"></i> New Chat
+        </button>
+      </div>
+      <div style="padding:12px">
+        <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:0 4px">Subject</div>
+        <select id="subjectSelect" class="form-control" style="background:#1e293b;color:#e2e8f0;border-color:rgba(255,255,255,.1);font-size:13px;margin-bottom:12px">
+          <option value="">All Subjects</option>
+          <option>Data Structures</option>
+          <option>DBMS</option>
+          <option>Operating Systems</option>
+          <option>Computer Networks</option>
+          <option>Python Programming</option>
+          <option>Mathematics</option>
+          <option>C/C++</option>
+          <option>Algorithms</option>
+        </select>
+        <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:0 4px">Difficulty</div>
+        <div class="d-flex gap-2 mb-3">
+          <button class="diff-btn active" data-level="beginner" onclick="setDiff(this,'beginner')">Beginner</button>
+          <button class="diff-btn" data-level="intermediate" onclick="setDiff(this,'intermediate')">Mid</button>
+          <button class="diff-btn" data-level="advanced" onclick="setDiff(this,'advanced')">Adv</button>
+        </div>
+      </div>
+      <div style="padding:0 12px;flex:1;overflow-y:auto">
+        <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">History</div>
+        <div id="chatHistory"></div>
+      </div>
+    </div>
+
+    <!-- Main Chat -->
+    <div class="chat-main" style="background:#fff">
+      <div class="chat-header">
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#06b6d4,#4f46e5);display:flex;align-items:center;justify-content:center;color:white;font-size:18px">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700">AI Study Tutor</div>
+            <div style="font-size:12px;color:#10b981;display:flex;align-items:center;gap:4px"><i class="fas fa-circle" style="font-size:8px"></i> Online · Ready to help</div>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn-outline" style="padding:6px 12px;font-size:13px" onclick="clearChat()"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <!-- Welcome message -->
+        <div class="message ai">
+          <div class="message-avatar"><i class="fas fa-robot"></i></div>
+          <div class="message-content">
+            <strong>👋 Hello! I'm your AI Study Tutor.</strong><br><br>
+            I can help you with:<br>
+            • <strong>Data Structures & Algorithms</strong><br>
+            • <strong>DBMS & SQL</strong><br>
+            • <strong>Operating Systems</strong><br>
+            • <strong>Computer Networks</strong><br>
+            • <strong>Python / C / C++</strong><br>
+            • <strong>Mathematics & more</strong><br><br>
+            Ask me anything — from simple definitions to complex problem-solving! 🚀
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggested Questions -->
+      <div id="suggestedQuestions" style="padding:0 20px 12px;border-top:1px solid #f1f5f9">
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:8px;font-weight:500">Suggested questions:</div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">
+          <span class="suggested-chip" onclick="sendSuggestion(this)">Explain Binary Search Trees</span>
+          <span class="suggested-chip" onclick="sendSuggestion(this)">What is ACID in DBMS?</span>
+          <span class="suggested-chip" onclick="sendSuggestion(this)">CPU Scheduling algorithms with examples</span>
+          <span class="suggested-chip" onclick="sendSuggestion(this)">TCP vs UDP differences</span>
+          <span class="suggested-chip" onclick="sendSuggestion(this)">Python OOP concepts</span>
+          <span class="suggested-chip" onclick="sendSuggestion(this)">Merge Sort with code</span>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input-area">
+        <div class="chat-input-wrapper">
+          <textarea class="chat-textarea" id="chatInput" placeholder="Ask any CSE question... (Press Enter to send)" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button id="sendBtn" onclick="sendMessage()" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;color:white;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:#94a3b8">AI responses may not always be 100% accurate. Always verify important facts.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.getElementById('sidebarMount').innerHTML = getSidebarHTML('ai-tutor');
+  document.getElementById('navbarMount').innerHTML = getTopNavbarHTML('AI Tutor');
+  if (!Auth.requireAuth()) {}
+
+  let messages = [];
+  let difficulty = 'intermediate';
+  let chatHistories = JSON.parse(localStorage.getItem('chatHistories') || '[]');
+
+  // Difficulty button styles - run after DOM ready
+  function styleDiffBtns() {
+    document.querySelectorAll('.diff-btn').forEach(b => {
+      b.style.cssText = 'background:#1e293b;color:#94a3b8;border:1px solid rgba(255,255,255,.1);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex:1';
+    });
+    const active = document.querySelector('.diff-btn.active');
+    if (active) active.style.cssText = 'background:#4f46e5;color:white;border:1px solid #4f46e5;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex:1';
+  }
+  document.addEventListener('DOMContentLoaded', styleDiffBtns);
+
+  function setDiff(btn, level) {
+    difficulty = level;
+    document.querySelectorAll('.diff-btn').forEach(b => b.style.cssText = 'background:#1e293b;color:#94a3b8;border:1px solid rgba(255,255,255,.1);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex:1');
+    btn.style.cssText = 'background:#4f46e5;color:white;border:1px solid #4f46e5;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex:1';
+  }
+
+  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+
+  function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+
+  function sendSuggestion(el) {
+    document.getElementById('chatInput').value = el.textContent;
+    sendMessage();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    document.getElementById('suggestedQuestions').style.display = 'none';
+    addMessage('user', text);
+    messages.push({ role: 'user', content: text });
+    input.value = '';
+    input.style.height = 'auto';
+
+    // Show typing
+    const typingId = showTyping();
+    document.getElementById('sendBtn').disabled = true;
+
+    const subject = document.getElementById('subjectSelect').value;
+    const res = await api.post('/ai/chat', { messages, subject, difficulty });
+
+    removeTyping(typingId);
+    document.getElementById('sendBtn').disabled = false;
+
+    if (res?.success) {
+      addMessage('ai', res.response);
+      messages.push({ role: 'assistant', content: res.response });
+      saveToHistory(text);
+    } else {
+      addMessage('ai', '❌ Sorry, I couldn\'t process your question. Please try again.');
+    }
+  }
+
+  function addMessage(role, content) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    const avatar = role === 'user' ? (Auth.getUser()?.name || 'S').charAt(0).toUpperCase() : '<i class="fas fa-robot"></i>';
+    const renderedContent = role === 'ai' ? renderMarkdown(content) : content;
+    div.innerHTML = `
+      <div class="message-avatar">${avatar}</div>
+      <div class="message-content">
+        ${renderedContent}
+        ${role === 'ai' ? `<div style="margin-top:8px;display:flex;gap:6px"><button onclick="copyText(this)" data-text="${encodeURIComponent(content)}" style="background:none;border:1px solid #e2e8f0;padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;color:#64748b"><i class="fas fa-copy"></i> Copy</button></div>` : ''}
+      </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function showTyping() {
+    const id = 'typing_' + Date.now();
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'message ai'; div.id = id;
+    div.innerHTML = '<div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return id;
+  }
+
+  function removeTyping(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+  function copyText(btn) {
+    const text = decodeURIComponent(btn.getAttribute('data-text'));
+    navigator.clipboard.writeText(text).then(() => { btn.innerHTML = '<i class="fas fa-check"></i> Copied'; setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i> Copy', 2000); });
+  }
+
+  function saveToHistory(question) {
+    chatHistories.unshift({ id: Date.now(), question: question.substring(0, 40), date: new Date().toISOString() });
+    if (chatHistories.length > 10) chatHistories = chatHistories.slice(0, 10);
+    localStorage.setItem('chatHistories', JSON.stringify(chatHistories));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const el = document.getElementById('chatHistory');
+    if (!chatHistories.length) { el.innerHTML = '<div style="font-size:12px;color:#475569;text-align:center;padding:8px">No history yet</div>'; return; }
+    el.innerHTML = chatHistories.map(h => `
+      <div class="chat-history-item"><i class="fas fa-comment-alt" style="font-size:12px"></i>${h.question}...</div>
+    `).join('');
+  }
+
+  function newChat() { messages = []; document.getElementById('chatMessages').innerHTML = ''; document.getElementById('suggestedQuestions').style.display = 'block'; addMessage('ai', '👋 New conversation started! Ask me anything about CSE topics.'); }
+  function clearChat() { messages = []; document.getElementById('chatMessages').innerHTML = ''; document.getElementById('suggestedQuestions').style.display = 'block'; }
+
+  document.addEventListener('DOMContentLoaded', () => { fillUserInfo(); renderHistory(); });
+</script>
+</body>
+</html>

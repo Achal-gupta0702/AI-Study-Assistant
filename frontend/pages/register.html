@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card" style="max-width:480px">
+    <div class="auth-logo">
+      <div class="logo-icon"><i class="fas fa-brain"></i></div>
+      <h1 class="auth-title">Create Your Account</h1>
+      <p class="auth-sub">Join 10,000+ students studying smarter</p>
+    </div>
+
+    <form id="registerForm">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">Full Name</label>
+          <div class="input-group-icon">
+            <i class="fas fa-user"></i>
+            <input type="text" id="name" class="form-control" placeholder="Your full name" required>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Email Address</label>
+          <div class="input-group-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">College / University</label>
+          <div class="input-group-icon">
+            <i class="fas fa-university"></i>
+            <input type="text" id="college" class="form-control" placeholder="Your college">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Current Semester</label>
+          <select id="semester" class="form-control">
+            <option value="">Select semester</option>
+            <option>1st Semester</option><option>2nd Semester</option>
+            <option>3rd Semester</option><option>4th Semester</option>
+            <option>5th Semester</option><option>6th Semester</option>
+            <option>7th Semester</option><option>8th Semester</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Password</label>
+          <div class="input-group-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" class="form-control" placeholder="Min. 6 characters" required minlength="6">
+            <i class="fas fa-eye toggle-pw" id="togglePw"></i>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Confirm Password</label>
+          <div class="input-group-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="confirmPassword" class="form-control" placeholder="Repeat your password" required>
+          </div>
+        </div>
+      </div>
+
+      <div id="errorMsg" class="alert alert-danger d-none mt-3" role="alert"></div>
+
+      <div style="margin:20px 0;font-size:13px;color:#64748b">
+        By registering, you agree to our <a href="#" style="color:#4f46e5">Terms of Service</a> and <a href="#" style="color:#4f46e5">Privacy Policy</a>.
+      </div>
+
+      <button type="submit" class="btn-primary w-100 justify-content-center" style="padding:12px">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:#64748b">
+      Already have an account? <a href="login.html" style="color:#4f46e5;font-weight:600;text-decoration:none">Sign in</a>
+    </p>
+    <p style="text-align:center;margin-top:8px;font-size:13px">
+      <a href="../index.html" style="color:#94a3b8;text-decoration:none"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script>
+  if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+
+  document.getElementById('togglePw').addEventListener('click', function() {
+    const pw = document.getElementById('password');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+    this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash');
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errDiv = document.getElementById('errorMsg');
+    const btn = e.target.querySelector('button[type="submit"]');
+    errDiv.classList.add('d-none');
+
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirmPassword').value;
+    if (password !== confirm) {
+      errDiv.textContent = 'Passwords do not match'; errDiv.classList.remove('d-none'); return;
+    }
+
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+    btn.disabled = true;
+
+    const res = await api.post('/auth/register', {
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      password, college: document.getElementById('college').value,
+      semester: document.getElementById('semester').value
+    });
+
+    if (res && res.success) {
+      Auth.setAuth(res.token, res.user);
+      window.location.href = 'dashboard.html';
+    } else {
+      errDiv.textContent = res?.message || 'Registration failed.';
+      errDiv.classList.remove('d-none');
+      btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

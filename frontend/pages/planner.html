@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Planner — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="sidebarMount"></div>
+<div class="main-wrapper">
+  <div id="navbarMount"></div>
+  <div class="page-content">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+      <div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">📅 Study Planner</h2>
+        <p style="color:#64748b;font-size:14px;margin:0">Plan your study sessions and track daily goals</p>
+      </div>
+      <button class="btn-primary" onclick="showGenerateModal()"><i class="fas fa-magic"></i> AI Generate Plan</button>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="grid-4 mb-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(79,70,229,.1);color:#4f46e5"><i class="fas fa-tasks"></i></div>
+        <div class="stat-value text-gradient" id="totalTasks">0</div>
+        <div class="stat-label">Total Tasks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,.1);color:#10b981"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-value" style="color:#10b981" id="doneTasks">0</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fas fa-clock"></i></div>
+        <div class="stat-value" style="color:#f59e0b" id="pendingTasks">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(239,68,68,.1);color:#ef4444"><i class="fas fa-percentage"></i></div>
+        <div class="stat-value" style="color:#ef4444" id="completionPct">0%</div>
+        <div class="stat-label">Completion Rate</div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <!-- Filter -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="filter-btn active" onclick="filterTasks('all',this)" style="padding:6px 14px;border:1.5px solid #4f46e5;background:#4f46e5;color:white;border-radius:99px;font-size:13px;cursor:pointer">All</button>
+          <button class="filter-btn" onclick="filterTasks('today',this)" style="padding:6px 14px;border:1.5px solid #e2e8f0;background:white;color:#475569;border-radius:99px;font-size:13px;cursor:pointer">Today</button>
+          <button class="filter-btn" onclick="filterTasks('pending',this)" style="padding:6px 14px;border:1.5px solid #e2e8f0;background:white;color:#475569;border-radius:99px;font-size:13px;cursor:pointer">Pending</button>
+          <button class="filter-btn" onclick="filterTasks('completed',this)" style="padding:6px 14px;border:1.5px solid #e2e8f0;background:white;color:#475569;border-radius:99px;font-size:13px;cursor:pointer">Done</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📋 Tasks</span>
+            <button class="btn-primary" onclick="showAddTask()" style="padding:6px 14px;font-size:13px"><i class="fas fa-plus"></i> Add Task</button>
+          </div>
+          <div class="card-body" id="tasksList" style="padding:12px">
+            <div style="text-align:center;color:#94a3b8;padding:20px;font-size:13px"><i class="fas fa-spinner fa-spin"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <!-- Add/Edit Task Form -->
+        <div class="card mb-4">
+          <div class="card-header"><span class="card-title" id="taskFormTitle">➕ Add Task</span></div>
+          <div class="card-body" id="taskForm">
+            <div class="form-group">
+              <label class="form-label">Subject</label>
+              <select id="taskSubject" class="form-control">
+                <option>Data Structures</option><option>DBMS</option>
+                <option>Operating Systems</option><option>Computer Networks</option>
+                <option>Python Programming</option><option>Mathematics</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Topic</label>
+              <input type="text" id="taskTopic" class="form-control" placeholder="Specific topic...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" id="taskDate" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration (minutes)</label>
+              <input type="number" id="taskDuration" class="form-control" value="60" min="15" step="15">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Priority</label>
+              <select id="taskPriority" class="form-control">
+                <option value="high">🔴 High</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="low">🟢 Low</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes (optional)</label>
+              <textarea id="taskNotes" class="form-control" rows="2" placeholder="Additional notes..."></textarea>
+            </div>
+            <button class="btn-primary w-100 justify-content-center" onclick="saveTask()"><i class="fas fa-save"></i> Save Task</button>
+          </div>
+        </div>
+        <!-- Progress -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">📊 Today's Progress</span></div>
+          <div class="card-body">
+            <div style="margin-bottom:8px;font-size:13px;color:#64748b;display:flex;justify-content:space-between">
+              <span>Daily Goal</span><span id="dailyGoal">0/4 hours</span>
+            </div>
+            <div class="progress-bar-custom mb-4">
+              <div class="progress-fill" id="dailyGoalBar" style="width:0%"></div>
+            </div>
+            <button class="btn-outline w-100 justify-content-center" onclick="logStudyTime()"><i class="fas fa-clock"></i> Log Study Time</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Generate Plan Modal -->
+<div class="modal fade" id="generateModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">🤖 AI Study Plan Generator</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Exam Date</label>
+          <input type="date" id="genExamDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Available Hours Per Day</label>
+          <select id="genHours" class="form-control">
+            <option value="2">2 hours</option><option value="3">3 hours</option>
+            <option value="4" selected>4 hours</option><option value="5">5 hours</option><option value="6">6 hours</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subjects to Cover</label>
+          <div id="genSubjects">
+            <label style="font-size:13px;display:flex;gap:8px;align-items:center;margin-bottom:6px"><input type="checkbox" value="Data Structures" checked> Data Structures</label>
+            <label style="font-size:13px;display:flex;gap:8px;align-items:center;margin-bottom:6px"><input type="checkbox" value="DBMS" checked> DBMS</label>
+            <label style="font-size:13px;display:flex;gap:8px;align-items:center;margin-bottom:6px"><input type="checkbox" value="Operating Systems" checked> Operating Systems</label>
+            <label style="font-size:13px;display:flex;gap:8px;align-items:center;margin-bottom:6px"><input type="checkbox" value="Computer Networks"> Computer Networks</label>
+            <label style="font-size:13px;display:flex;gap:8px;align-items:center;margin-bottom:6px"><input type="checkbox" value="Python Programming"> Python Programming</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-primary" onclick="generatePlan()"><i class="fas fa-magic"></i> Generate Plan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Log Time Modal -->
+<div class="modal fade" id="logModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">⏱ Log Study Time</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Hours Studied</label>
+          <input type="number" id="logHours" class="form-control" value="1" min="0.5" step="0.5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select id="logSubject" class="form-control">
+            <option>Data Structures</option><option>DBMS</option><option>Operating Systems</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-primary" onclick="submitLog()"><i class="fas fa-save"></i> Log Session</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.getElementById('sidebarMount').innerHTML = getSidebarHTML('planner');
+  document.getElementById('navbarMount').innerHTML = getTopNavbarHTML('Study Planner');
+  if (!Auth.requireAuth()) {}
+
+  let allTasks = [], activePlanId = null, editTaskId = null;
+  let filterMode = 'all';
+
+  // Set today as default date
+  document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('genExamDate').value = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+
+  async function loadPlans() {
+    const res = await api.get('/planner');
+    if (res?.success && res.plans.length) {
+      const plan = res.plans[0];
+      activePlanId = plan._id;
+      allTasks = plan.tasks || [];
+      renderTasks();
+      updateStats();
+    } else {
+      // Create default plan
+      const r = await api.post('/planner', { title: 'My Study Plan', tasks: [] });
+      if (r?.success) { activePlanId = r.plan._id; allTasks = []; renderTasks(); }
+    }
+  }
+
+  function renderTasks(tasks) {
+    const list = tasks || getFilteredTasks();
+    const el = document.getElementById('tasksList');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:20px"><i class="fas fa-clipboard-list" style="font-size:36px;color:#cbd5e1;display:block;margin-bottom:8px"></i><p style="color:#94a3b8;font-size:13px">No tasks. Click "+ Add Task" to get started!</p></div>';
+      return;
+    }
+    el.innerHTML = list.map(t => `
+      <div class="task-item ${t.completed ? 'completed' : ''}" id="task_${t._id}">
+        <div class="task-priority-dot priority-${t.priority}"></div>
+        <input type="checkbox" style="width:18px;height:18px;cursor:pointer;accent-color:#4f46e5" ${t.completed ? 'checked' : ''} onchange="toggleTask('${t._id}', this.checked)">
+        <div style="flex:1">
+          <div class="task-title" style="font-weight:600;font-size:14px">${t.subject}: ${t.topic}</div>
+          <div style="font-size:12px;color:#94a3b8;display:flex;gap:12px;margin-top:2px">
+            <span><i class="fas fa-calendar"></i> ${formatDate(t.date)}</span>
+            <span><i class="fas fa-clock"></i> ${t.duration}min</span>
+            <span class="badge-${t.priority === 'high' ? 'danger' : t.priority === 'medium' ? 'warning' : 'success'}">${t.priority}</span>
+          </div>
+          ${t.notes ? `<div style="font-size:12px;color:#64748b;margin-top:4px">${t.notes}</div>` : ''}
+        </div>
+        <button onclick="deleteTask('${t._id}')" style="background:none;border:none;color:#94a3b8;cursor:pointer;padding:4px"><i class="fas fa-trash"></i></button>
+      </div>
+    `).join('');
+  }
+
+  function getFilteredTasks() {
+    const today = new Date().toDateString();
+    if (filterMode === 'today') return allTasks.filter(t => new Date(t.date).toDateString() === today);
+    if (filterMode === 'pending') return allTasks.filter(t => !t.completed);
+    if (filterMode === 'completed') return allTasks.filter(t => t.completed);
+    return allTasks;
+  }
+
+  function filterTasks(mode, btn) {
+    filterMode = mode;
+    document.querySelectorAll('.filter-btn').forEach(b => { b.style.background = 'white'; b.style.borderColor = '#e2e8f0'; b.style.color = '#475569'; });
+    btn.style.background = '#4f46e5'; btn.style.borderColor = '#4f46e5'; btn.style.color = 'white';
+    renderTasks();
+  }
+
+  function updateStats() {
+    const total = allTasks.length;
+    const done = allTasks.filter(t => t.completed).length;
+    const pending = total - done;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById('totalTasks').textContent = total;
+    document.getElementById('doneTasks').textContent = done;
+    document.getElementById('pendingTasks').textContent = pending;
+    document.getElementById('completionPct').textContent = pct + '%';
+  }
+
+  async function saveTask() {
+    if (!activePlanId) return;
+    const task = {
+      subject: document.getElementById('taskSubject').value,
+      topic: document.getElementById('taskTopic').value || 'General Study',
+      date: document.getElementById('taskDate').value,
+      duration: parseInt(document.getElementById('taskDuration').value),
+      priority: document.getElementById('taskPriority').value,
+      notes: document.getElementById('taskNotes').value
+    };
+    const res = await api.post(`/planner/${activePlanId}/tasks`, task);
+    if (res?.success) {
+      allTasks = res.plan.tasks;
+      renderTasks(); updateStats();
+      Toast.show('Task added!', 'success');
+      document.getElementById('taskTopic').value = '';
+      document.getElementById('taskNotes').value = '';
+    }
+  }
+
+  async function toggleTask(taskId, completed) {
+    const res = await api.put(`/planner/${activePlanId}/tasks/${taskId}`, { completed });
+    if (res?.success) { allTasks = res.plan.tasks; renderTasks(); updateStats(); }
+  }
+
+  async function deleteTask(taskId) {
+    const res = await api.delete(`/planner/${activePlanId}/tasks/${taskId}`);
+    if (res?.success) { allTasks = res.plan.tasks; renderTasks(); updateStats(); Toast.show('Task deleted', 'info'); }
+  }
+
+  function showAddTask() { document.getElementById('taskFormTitle').textContent = '➕ Add Task'; }
+
+  async function generatePlan() {
+    const examDate = document.getElementById('genExamDate').value;
+    const hours = parseInt(document.getElementById('genHours').value);
+    const subjects = [...document.querySelectorAll('#genSubjects input:checked')].map(i => i.value);
+    if (!subjects.length) { Toast.show('Select at least one subject', 'warning'); return; }
+    Loader.show('Generating study plan...');
+
+    const days = Math.max(1, Math.ceil((new Date(examDate) - Date.now()) / 86400000));
+    const tasks = [];
+    let d = new Date(); d.setHours(0,0,0,0);
+
+    for (let day = 0; day < Math.min(days, 14); day++) {
+      const daySubjects = subjects.filter((_, i) => i % subjects.length === day % subjects.length);
+      const subject = subjects[day % subjects.length];
+      tasks.push({ subject, topic: 'Revision & Practice', date: new Date(d.getTime() + day * 86400000).toISOString(), duration: hours * 60 / subjects.length * subjects.length, priority: day < 3 ? 'high' : 'medium' });
+    }
+
+    const res = await api.post('/planner', { title: `Exam Prep Plan (${examDate})`, examDate, subjects, dailyGoalHours: hours, tasks });
+    Loader.hide();
+    if (res?.success) {
+      activePlanId = res.plan._id; allTasks = res.plan.tasks;
+      renderTasks(); updateStats();
+      bootstrap.Modal.getInstance(document.getElementById('generateModal')).hide();
+      Toast.show('Study plan generated!', 'success');
+    }
+  }
+
+  function showGenerateModal() { new bootstrap.Modal(document.getElementById('generateModal')).show(); }
+  function logStudyTime() { new bootstrap.Modal(document.getElementById('logModal')).show(); }
+
+  async function submitLog() {
+    const hours = parseFloat(document.getElementById('logHours').value);
+    const subject = document.getElementById('logSubject').value;
+    const res = await api.post('/progress/log', { hours, subject });
+    if (res?.success) {
+      Toast.show(`Logged ${hours}h study session!`, 'success');
+      bootstrap.Modal.getInstance(document.getElementById('logModal')).hide();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { fillUserInfo(); loadPlans(); });
+</script>
+</body>
+</html>

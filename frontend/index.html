@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Study Assistant — Study Smarter. Learn Faster. Achieve More.</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="frontend/css/main.css">
+  <link rel="stylesheet" href="frontend/css/pages.css">
+  <style>
+    body { background: white; }
+    .landing-navbar .nav-link { padding: 6px 14px !important; }
+    .partners-logo { font-size: 22px; color: #94a3b8; font-weight: 800; letter-spacing: 2px; }
+    .testimonial-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px; height: 100%; }
+    .stars { color: #f59e0b; font-size: 14px; margin-bottom: 12px; }
+    .testimonial-text { font-size: 15px; color: #334155; line-height: 1.7; margin-bottom: 16px; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .author-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .benefit-item { display: flex; align-items: flex-start; gap: 14px; padding: 20px 0; border-bottom: 1px solid #f1f5f9; }
+    .benefit-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="landing-navbar" id="landingNav">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="#" class="navbar-brand d-flex align-items-center gap-2 text-decoration-none">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px">
+          <i class="fas fa-brain"></i>
+        </div>
+        <span style="font-size:18px;font-weight:800;color:#1e293b">AI Study Assistant</span>
+      </a>
+      <div class="d-none d-md-flex align-items-center gap-3">
+        <a href="#features" class="nav-link text-decoration-none" style="color:#1e293b;font-weight:500">Features</a>
+        <a href="#how-it-works" class="nav-link text-decoration-none" style="color:#1e293b;font-weight:500">How it Works</a>
+        <a href="#testimonials" class="nav-link text-decoration-none" style="color:#1e293b;font-weight:500">Reviews</a>
+        <a href="pages/login.html" class="btn-outline" style="padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;color:#1e293b;border:1.5px solid #e2e8f0">Login</a>
+        <a href="pages/register.html" class="btn-hero-primary" style="padding:9px 20px;font-size:14px">Get Started Free</a>
+      </div>
+      <button class="d-md-none btn" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div id="mobileMenu" style="display:none;padding:16px 0">
+      <a href="#features" class="d-block py-2 text-decoration-none" style="color:#1e293b">Features</a>
+      <a href="pages/login.html" class="d-block py-2 text-decoration-none" style="color:#1e293b">Login</a>
+      <a href="pages/register.html" class="btn-hero-primary d-inline-flex mt-2">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 hero-content">
+        <div class="hero-badge">
+          <i class="fas fa-sparkles"></i> AI-Powered Learning Platform
+        </div>
+        <h1 class="hero-title">
+          Study Smarter.<br>
+          <span class="highlight">Learn Faster.</span><br>
+          Achieve More.
+        </h1>
+        <p class="hero-subtitle">
+          The ultimate AI-powered study companion for B.Tech CSE students. Get instant explanations, generate quizzes, create flashcards, and build personalised study plans — all in one place.
+        </p>
+        <div class="hero-cta">
+          <a href="pages/register.html" class="btn-hero-primary">
+            <i class="fas fa-rocket"></i> Start Learning Free
+          </a>
+          <a href="pages/login.html" class="btn-hero-secondary">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-value">10K+</div>
+            <div class="hero-stat-label">Students</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">50K+</div>
+            <div class="hero-stat-label">Quizzes Taken</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">98%</div>
+            <div class="hero-stat-label">Satisfaction</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block hero-visual">
+        <div class="float-anim">
+          <div class="floating-card">
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#06b6d4,#4f46e5);display:flex;align-items:center;justify-content:center;color:white;font-size:20px"><i class="fas fa-robot"></i></div>
+              <div>
+                <div style="color:white;font-weight:700;font-size:15px">AI Tutor</div>
+                <div style="color:#64748b;font-size:12px">Online · Ready to help</div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:12px">
+              <div style="color:#94a3b8;font-size:12px;margin-bottom:6px">Student asks:</div>
+              <div style="color:white;font-size:14px">"Explain Binary Search Trees with code"</div>
+            </div>
+            <div style="background:rgba(79,70,229,.2);border-radius:10px;padding:14px">
+              <div style="color:#818cf8;font-size:12px;margin-bottom:6px">AI responds:</div>
+              <div style="color:#e2e8f0;font-size:13px;font-family:monospace">class BST:<br>&nbsp;&nbsp;def insert(self, val):<br>&nbsp;&nbsp;&nbsp;&nbsp;# O(log n) ✓</div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+              <div style="text-align:center">
+                <div style="color:white;font-weight:800;font-size:20px">15</div>
+                <div style="color:#64748b;font-size:11px">Subjects</div>
+              </div>
+              <div style="text-align:center">
+                <div style="color:#10b981;font-weight:800;font-size:20px">87%</div>
+                <div style="color:#64748b;font-size:11px">Avg Score</div>
+              </div>
+              <div style="text-align:center">
+                <div style="color:#f59e0b;font-weight:800;font-size:20px">14</div>
+                <div style="color:#64748b;font-size:11px">Day Streak 🔥</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="container">
+    <p style="text-align:center;color:#4f46e5;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Everything You Need</p>
+    <h2 class="section-title">Powerful Features for<br><span class="text-gradient">Smarter Studying</span></h2>
+    <p class="section-sub">From AI-powered explanations to smart flashcards — we've got every tool a B.Tech CSE student needs.</p>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(79,70,229,.1);color:#4f46e5"><i class="fas fa-robot"></i></div>
+          <h3 class="feature-title">AI Tutor (ChatGPT-style)</h3>
+          <p class="feature-desc">Ask any question about Python, DSA, DBMS, OS, CN and more. Get instant, structured explanations with code examples and exam tips.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(16,185,129,.1);color:#10b981"><i class="fas fa-sticky-note"></i></div>
+          <h3 class="feature-title">Smart Notes Summarizer</h3>
+          <p class="feature-desc">Paste your study material and get AI-generated summaries, key points, important terms, and possible exam questions instantly.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fas fa-question-circle"></i></div>
+          <h3 class="feature-title">Quiz Generator</h3>
+          <p class="feature-desc">Generate custom MCQ quizzes for any subject and topic. Choose difficulty, get explanations, and track your weak areas automatically.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(124,58,237,.1);color:#7c3aed"><i class="fas fa-layer-group"></i></div>
+          <h3 class="feature-title">AI Flashcards</h3>
+          <p class="feature-desc">Create and study AI-generated flashcards with flip animations. Mark cards as known or needs-review for spaced repetition learning.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(239,68,68,.1);color:#ef4444"><i class="fas fa-calendar-alt"></i></div>
+          <h3 class="feature-title">Smart Study Planner</h3>
+          <p class="feature-desc">Generate personalised daily/weekly study plans based on your exam date, available hours, and subject priorities. Never miss a topic.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(6,182,212,.1);color:#06b6d4"><i class="fas fa-chart-line"></i></div>
+          <h3 class="feature-title">Progress Tracking</h3>
+          <p class="feature-desc">Visual dashboards showing study hours, quiz scores, subject progress, study streak, and AI-powered recommendations to improve.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how-it-works">
+  <div class="container">
+    <p style="text-align:center;color:#4f46e5;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Simple Process</p>
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-sub">Get started in minutes and transform your study habits forever.</p>
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:10px">Create Account</h3>
+          <p style="color:#64748b;font-size:14px">Sign up free in 30 seconds. No credit card needed. Your AI study assistant is ready instantly.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:10px">Set Your Subjects</h3>
+          <p style="color:#64748b;font-size:14px">Choose your B.Tech CSE subjects and topics. We auto-populate with the standard curriculum.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:10px">Study with AI</h3>
+          <p style="color:#64748b;font-size:14px">Use AI Tutor, generate quizzes, create flashcards, and summarise your notes with one click.</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:10px">Track & Improve</h3>
+          <p style="color:#64748b;font-size:14px">Monitor your progress, identify weak topics, and get AI recommendations to ace your exams.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section style="padding:100px 0" id="benefits">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <p style="color:#4f46e5;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Why Students Love Us</p>
+        <h2 style="font-size:2.2rem;font-weight:800;line-height:1.2;margin-bottom:16px">Built Specifically for<br><span class="text-gradient">B.Tech CSE Students</span></h2>
+        <p style="color:#64748b;font-size:16px;margin-bottom:32px">We understand the pressure of engineering exams. Our AI is trained on CSE curriculum topics so you get relevant, exam-focused answers.</p>
+        <div>
+          <div class="benefit-item">
+            <div class="benefit-icon" style="background:rgba(79,70,229,.1)"><i class="fas fa-brain" style="color:#4f46e5"></i></div>
+            <div>
+              <h4 style="font-size:16px;font-weight:700;margin-bottom:4px">CSE-Specific AI Knowledge</h4>
+              <p style="color:#64748b;font-size:14px;margin:0">Trained on DSA, DBMS, OS, CN, Python, and more B.Tech subjects</p>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon" style="background:rgba(16,185,129,.1)"><i class="fas fa-fire" style="color:#10b981"></i></div>
+            <div>
+              <h4 style="font-size:16px;font-weight:700;margin-bottom:4px">Streak-Based Motivation</h4>
+              <p style="color:#64748b;font-size:14px;margin:0">Daily study streaks and achievement badges to keep you consistent</p>
+            </div>
+          </div>
+          <div class="benefit-item" style="border-bottom:none">
+            <div class="benefit-icon" style="background:rgba(245,158,11,.1)"><i class="fas fa-bullseye" style="color:#f59e0b"></i></div>
+            <div>
+              <h4 style="font-size:16px;font-weight:700;margin-bottom:4px">Exam-Oriented Answers</h4>
+              <p style="color:#64748b;font-size:14px;margin:0">Get answers formatted exactly how examiners expect — with definitions, examples, and comparisons</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="row g-3">
+          <div class="col-6">
+            <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:16px;padding:24px;color:white;text-align:center">
+              <div style="font-size:36px;font-weight:900;margin-bottom:8px">87%</div>
+              <div style="font-size:14px;opacity:.8">Average Score Improvement</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div style="background:linear-gradient(135deg,#10b981,#06b6d4);border-radius:16px;padding:24px;color:white;text-align:center">
+              <div style="font-size:36px;font-weight:900;margin-bottom:8px">3×</div>
+              <div style="font-size:14px;opacity:.8">Faster Revision Speed</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:16px;padding:24px;color:white;text-align:center">
+              <div style="font-size:36px;font-weight:900;margin-bottom:8px">50K+</div>
+              <div style="font-size:14px;opacity:.8">Quizzes Generated</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div style="background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:16px;padding:24px;color:white;text-align:center">
+              <div style="font-size:36px;font-weight:900;margin-bottom:8px">10K+</div>
+              <div style="font-size:14px;opacity:.8">Active Students</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="background:#f8fafc;padding:100px 0" id="testimonials">
+  <div class="container">
+    <p style="text-align:center;color:#4f46e5;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Student Reviews</p>
+    <h2 class="section-title">What Students Say</h2>
+    <p class="section-sub">Join thousands of B.Tech students already studying smarter.</p>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"The AI Tutor explained Binary Trees better than my professor! The code examples are perfect for understanding and the exam tips are super helpful."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">R</div>
+            <div><div style="font-weight:700;font-size:14px">Rahul Sharma</div><div style="font-size:12px;color:#64748b">3rd Year, CSE · IIT Indore</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"The quiz generator is amazing! I generated 200+ DBMS questions and my exam score went from 60% to 89%. The weak topic analysis is incredibly useful."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,#10b981,#06b6d4)">P</div>
+            <div><div style="font-weight:700;font-size:14px">Priya Patel</div><div style="font-size:12px;color:#64748b">2nd Year, CSE · BITS Pilani</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"The study planner literally saved my semester! It created a perfect revision schedule for 6 subjects 2 weeks before exams. I cleared all subjects with distinction."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">A</div>
+            <div><div style="font-weight:700;font-size:14px">Arjun Nair</div><div style="font-size:12px;color:#64748b">4th Year, CSE · NIT Trichy</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(79,70,229,.2);border:1px solid rgba(79,70,229,.4);color:#818cf8;padding:6px 16px;border-radius:99px;font-size:13px;font-weight:600;margin-bottom:24px">
+      <i class="fas fa-graduation-cap"></i> Free for All B.Tech Students
+    </div>
+    <h2 class="cta-title">Ready to Ace Your Exams?</h2>
+    <p class="cta-sub">Join 10,000+ students already using AI Study Assistant.<br>Start your free account today — no credit card required.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="pages/register.html" class="btn-hero-primary" style="font-size:16px;padding:14px 32px">
+        <i class="fas fa-rocket"></i> Get Started Free
+      </a>
+      <a href="pages/login.html" class="btn-hero-secondary" style="font-size:16px;padding:14px 32px">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="footer-brand d-flex align-items-center gap-2 mb-3">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;font-size:16px"><i class="fas fa-brain"></i></div>
+          AI Study Assistant
+        </div>
+        <p class="footer-desc">The AI-powered study platform built for B.Tech CSE students. Learn smarter, not harder.</p>
+        <div class="d-flex gap-3 mt-3">
+          <a href="#" style="color:#64748b;font-size:18px"><i class="fab fa-twitter"></i></a>
+          <a href="#" style="color:#64748b;font-size:18px"><i class="fab fa-linkedin"></i></a>
+          <a href="#" style="color:#64748b;font-size:18px"><i class="fab fa-github"></i></a>
+          <a href="#" style="color:#64748b;font-size:18px"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h4 class="footer-title">Features</h4>
+        <a href="#" class="footer-link">AI Tutor</a>
+        <a href="#" class="footer-link">Quiz Generator</a>
+        <a href="#" class="footer-link">Flashcards</a>
+        <a href="#" class="footer-link">Notes Summarizer</a>
+        <a href="#" class="footer-link">Study Planner</a>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h4 class="footer-title">Subjects</h4>
+        <a href="#" class="footer-link">Data Structures</a>
+        <a href="#" class="footer-link">DBMS</a>
+        <a href="#" class="footer-link">Operating Systems</a>
+        <a href="#" class="footer-link">Computer Networks</a>
+        <a href="#" class="footer-link">Python</a>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h4 class="footer-title">Company</h4>
+        <a href="#" class="footer-link">About</a>
+        <a href="#" class="footer-link">Blog</a>
+        <a href="#" class="footer-link">Careers</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h4 class="footer-title">Legal</h4>
+        <a href="#" class="footer-link">Privacy Policy</a>
+        <a href="#" class="footer-link">Terms of Service</a>
+        <a href="#" class="footer-link">Cookie Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p style="margin:0">© 2024 AI Study Assistant. Made with ❤️ for B.Tech CSE Students in India.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('landingNav').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  function toggleMobileMenu() {
+    const m = document.getElementById('mobileMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // Redirect if logged in
+  if (localStorage.getItem('asa_token')) {
+    window.location.href = 'pages/dashboard.html';
+  }
+</script>
+</body>
+</html>

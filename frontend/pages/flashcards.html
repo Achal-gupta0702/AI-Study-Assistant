@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="sidebarMount"></div>
+<div class="main-wrapper">
+  <div id="navbarMount"></div>
+  <div class="page-content">
+
+    <!-- Generate Screen -->
+    <div id="generateScreen">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">🃏 Flashcards</h2>
+          <p style="color:#64748b;font-size:14px;margin:0">Generate AI flashcards or study from your saved sets</p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Generate New Flashcards</span></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Subject</label>
+                <select id="fcSubject" class="form-control">
+                  <option>Data Structures</option><option>DBMS</option>
+                  <option>Operating Systems</option><option>Computer Networks</option>
+                  <option>Python Programming</option><option>Mathematics</option>
+                  <option>C/C++</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Topic</label>
+                <input type="text" id="fcTopic" class="form-control" placeholder="e.g., Binary Trees, SQL Joins...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Number of Cards</label>
+                <select id="fcCount" class="form-control">
+                  <option value="5">5 Cards</option>
+                  <option value="10" selected>10 Cards</option>
+                  <option value="15">15 Cards</option>
+                  <option value="20">20 Cards</option>
+                </select>
+              </div>
+              <button class="btn-primary w-100 justify-content-center" onclick="generateFlashcards()" style="padding:12px">
+                <i class="fas fa-magic"></i> Generate Flashcards
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="card">
+            <div class="card-header"><span class="card-title">📚 My Flashcard Sets</span></div>
+            <div class="card-body" id="savedSets">
+              <div style="text-align:center;color:#94a3b8;padding:20px;font-size:13px"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Study Screen -->
+    <div id="studyScreen" style="display:none">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <button class="btn-outline" onclick="exitStudy()"><i class="fas fa-arrow-left"></i> Back</button>
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:800" id="setTitle">Flashcards</div>
+          <div style="font-size:13px;color:#64748b">Card <span id="cardIndex">1</span> of <span id="totalCards">0</span></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline" style="padding:6px 12px;font-size:13px" onclick="shuffleCards()"><i class="fas fa-random"></i></button>
+          <button class="btn-outline" style="padding:6px 12px;font-size:13px;background:#10b981;color:white;border-color:#10b981" id="knownCount">0 Known</button>
+          <button class="btn-outline" style="padding:6px 12px;font-size:13px;background:#f59e0b;color:white;border-color:#f59e0b" id="reviewCount">0 Review</button>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div style="background:#f1f5f9;height:6px;border-radius:3px;margin-bottom:24px">
+        <div id="fcProgressBar" style="height:100%;background:linear-gradient(90deg,#4f46e5,#06b6d4);border-radius:3px;transition:width .3s"></div>
+      </div>
+
+      <!-- Flashcard -->
+      <div class="flashcard-scene" onclick="flipCard()">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <div class="card-label">Question — Click to flip</div>
+            <div class="card-text" id="cardQuestion">Loading...</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-label">Answer</div>
+            <div class="card-text" id="cardAnswer" style="font-size:15px;overflow-y:auto;max-height:250px;text-align:left"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div style="display:flex;justify-content:center;gap:16px;margin-top:24px;flex-wrap:wrap">
+        <button class="btn-outline" onclick="prevCard()" style="padding:10px 20px"><i class="fas fa-arrow-left"></i> Previous</button>
+        <button style="background:rgba(239,68,68,.1);color:#ef4444;border:1.5px solid #ef4444;padding:10px 20px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer" onclick="markReview()">
+          <i class="fas fa-redo"></i> Review Later
+        </button>
+        <button style="background:rgba(16,185,129,.1);color:#10b981;border:1.5px solid #10b981;padding:10px 20px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer" onclick="markKnown()">
+          <i class="fas fa-check"></i> I Know This
+        </button>
+        <button class="btn-outline" onclick="nextCard()" style="padding:10px 20px">Next <i class="fas fa-arrow-right"></i></button>
+      </div>
+
+      <!-- Summary bar -->
+      <div style="margin-top:24px;background:#f8fafc;border-radius:12px;padding:20px;display:flex;justify-content:space-around;text-align:center">
+        <div><div style="font-size:24px;font-weight:800;color:#10b981" id="knownTotal">0</div><div style="font-size:12px;color:#64748b">Known</div></div>
+        <div><div style="font-size:24px;font-weight:800;color:#f59e0b" id="reviewTotal">0</div><div style="font-size:12px;color:#64748b">Review</div></div>
+        <div><div style="font-size:24px;font-weight:800;color:#94a3b8" id="unseenTotal">0</div><div style="font-size:12px;color:#64748b">Unseen</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.getElementById('sidebarMount').innerHTML = getSidebarHTML('flashcards');
+  document.getElementById('navbarMount').innerHTML = getTopNavbarHTML('Flashcards');
+  if (!Auth.requireAuth()) {}
+
+  let currentCards = [], currentCardIndex = 0, currentSetId = null, isFlipped = false;
+
+  async function generateFlashcards() {
+    const subject = document.getElementById('fcSubject').value;
+    const topic = document.getElementById('fcTopic').value.trim();
+    const count = parseInt(document.getElementById('fcCount').value);
+    if (!topic) { Toast.show('Please enter a topic', 'warning'); return; }
+
+    Loader.show('Generating flashcards...');
+    const res = await api.post('/ai/flashcards', { subject, topic, count });
+    Loader.hide();
+
+    if (!res?.success || !res.cards?.length) { Toast.show('Failed to generate flashcards', 'error'); return; }
+
+    // Save to DB
+    const saveRes = await api.post('/flashcards', {
+      title: `${subject}: ${topic}`, subject, topic, cards: res.cards
+    });
+    if (saveRes?.success) {
+      currentSetId = saveRes.set._id;
+      Toast.show('Flashcard set saved!', 'success');
+      loadSets();
+    }
+
+    startStudy(res.cards, `${subject}: ${topic}`);
+  }
+
+  function startStudy(cards, title) {
+    currentCards = [...cards];
+    currentCardIndex = 0;
+    isFlipped = false;
+    document.getElementById('generateScreen').style.display = 'none';
+    document.getElementById('studyScreen').style.display = 'block';
+    document.getElementById('setTitle').textContent = title;
+    document.getElementById('totalCards').textContent = cards.length;
+    renderCard();
+  }
+
+  function renderCard() {
+    const card = currentCards[currentCardIndex];
+    if (!card) return;
+    document.getElementById('cardIndex').textContent = currentCardIndex + 1;
+    document.getElementById('cardQuestion').textContent = card.question;
+    document.getElementById('cardAnswer').textContent = card.answer;
+    document.getElementById('fcProgressBar').style.width = ((currentCardIndex + 1) / currentCards.length * 100) + '%';
+    document.getElementById('flashcard').classList.remove('flipped');
+    isFlipped = false;
+    updateCounts();
+  }
+
+  function flipCard() {
+    document.getElementById('flashcard').classList.toggle('flipped');
+    isFlipped = !isFlipped;
+  }
+
+  function nextCard() { if (currentCardIndex < currentCards.length - 1) { currentCardIndex++; renderCard(); } }
+  function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; renderCard(); } }
+
+  function shuffleCards() {
+    for (let i = currentCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [currentCards[i], currentCards[j]] = [currentCards[j], currentCards[i]];
+    }
+    currentCardIndex = 0;
+    renderCard();
+    Toast.show('Cards shuffled!', 'info');
+  }
+
+  async function markKnown() {
+    currentCards[currentCardIndex].isKnown = true;
+    currentCards[currentCardIndex].needsReview = false;
+    if (currentSetId) await api.patch(`/flashcards/${currentSetId}/card`, { cardIndex: currentCardIndex, isKnown: true, needsReview: false });
+    updateCounts();
+    Toast.show('Marked as known! ✅', 'success');
+    if (currentCardIndex < currentCards.length - 1) { currentCardIndex++; renderCard(); }
+  }
+
+  async function markReview() {
+    currentCards[currentCardIndex].needsReview = true;
+    currentCards[currentCardIndex].isKnown = false;
+    if (currentSetId) await api.patch(`/flashcards/${currentSetId}/card`, { cardIndex: currentCardIndex, isKnown: false, needsReview: true });
+    updateCounts();
+    Toast.show('Marked for review 🔄', 'warning');
+    if (currentCardIndex < currentCards.length - 1) { currentCardIndex++; renderCard(); }
+  }
+
+  function updateCounts() {
+    const known = currentCards.filter(c => c.isKnown).length;
+    const review = currentCards.filter(c => c.needsReview).length;
+    const unseen = currentCards.filter(c => !c.isKnown && !c.needsReview).length;
+    document.getElementById('knownCount').textContent = known + ' Known';
+    document.getElementById('reviewCount').textContent = review + ' Review';
+    document.getElementById('knownTotal').textContent = known;
+    document.getElementById('reviewTotal').textContent = review;
+    document.getElementById('unseenTotal').textContent = unseen;
+  }
+
+  function exitStudy() {
+    document.getElementById('studyScreen').style.display = 'none';
+    document.getElementById('generateScreen').style.display = 'block';
+    loadSets();
+  }
+
+  async function loadSets() {
+    const res = await api.get('/flashcards');
+    const el = document.getElementById('savedSets');
+    if (!res?.success || !res.sets?.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:20px"><i class="fas fa-layer-group" style="font-size:36px;color:#cbd5e1;display:block;margin-bottom:10px"></i><p style="color:#94a3b8;font-size:13px">No flashcard sets yet.<br>Generate your first set!</p></div>';
+      return;
+    }
+    el.innerHTML = res.sets.map(s => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#f8fafc;border-radius:10px;margin-bottom:10px;cursor:pointer" onclick="studySet('${s._id}')">
+        <div>
+          <div style="font-weight:700;font-size:14px">${s.title}</div>
+          <div style="font-size:12px;color:#94a3b8">${s.totalCards} cards · Last studied: ${s.lastStudied ? formatDate(s.lastStudied) : 'Never'}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge-success">${s.knownCount} Known</span>
+          <button class="btn-primary" style="padding:6px 14px;font-size:12px">Study</button>
+        </div>
+      </div>`).join('');
+  }
+
+  async function studySet(id) {
+    const res = await api.get(`/flashcards/${id}`);
+    if (res?.success) { currentSetId = id; startStudy(res.set.cards, res.set.title); }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { fillUserInfo(); loadSets(); });
+</script>
+</body>
+</html>

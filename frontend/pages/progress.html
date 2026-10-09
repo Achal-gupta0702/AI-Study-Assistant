@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="sidebarMount"></div>
+<div class="main-wrapper">
+  <div id="navbarMount"></div>
+  <div class="page-content">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">📊 Progress Tracker</h2>
+        <p style="color:#64748b;font-size:14px;margin:0">Track your learning journey and identify areas to improve</p>
+      </div>
+    </div>
+
+    <!-- Main Stats -->
+    <div class="grid-4 mb-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(79,70,229,.1);color:#4f46e5"><i class="fas fa-clock"></i></div>
+        <div class="stat-value text-gradient" id="totalHours">0</div>
+        <div class="stat-label">Total Study Hours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fas fa-fire"></i></div>
+        <div class="stat-value" style="color:#f59e0b" id="streak">0</div>
+        <div class="stat-label">Day Streak 🔥</div>
+        <div class="stat-change" style="font-size:12px;color:#f59e0b">Longest: <span id="longestStreak">0</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,.1);color:#10b981"><i class="fas fa-trophy"></i></div>
+        <div class="stat-value" style="color:#10b981" id="avgScore">0%</div>
+        <div class="stat-label">Avg Quiz Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(239,68,68,.1);color:#ef4444"><i class="fas fa-tasks"></i></div>
+        <div class="stat-value" style="color:#ef4444" id="quizCount">0</div>
+        <div class="stat-label">Quizzes Taken</div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Weekly Hours Chart -->
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-header"><span class="card-title">📈 Weekly Study Hours</span></div>
+          <div class="card-body"><canvas id="weeklyChart" height="200"></canvas></div>
+        </div>
+        <!-- Quiz Performance -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">🎯 Quiz Performance by Subject</span></div>
+          <div class="card-body"><canvas id="quizChart" height="200"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Right sidebar -->
+      <div class="col-lg-4">
+        <!-- Overall Progress -->
+        <div class="card mb-4">
+          <div class="card-header"><span class="card-title">📚 Overall Learning Progress</span></div>
+          <div class="card-body" id="overallProgress">
+            <div style="text-align:center;margin-bottom:16px">
+              <div style="font-size:48px;font-weight:900;color:#4f46e5" id="overallPct">0%</div>
+              <div style="font-size:13px;color:#64748b">of curriculum covered</div>
+            </div>
+            <div class="progress-bar-custom" style="height:12px;margin-bottom:20px">
+              <div class="progress-fill" id="overallBar" style="width:0%;height:100%"></div>
+            </div>
+            <div id="subjectBars"></div>
+          </div>
+        </div>
+
+        <!-- Strong & Weak Topics -->
+        <div class="card mb-4">
+          <div class="card-header"><span class="card-title">💪 Strong Topics</span></div>
+          <div class="card-body" id="strongTopics">
+            <div style="font-size:13px;color:#94a3b8">Take quizzes to identify strong topics</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚠️ Weak Topics</span></div>
+          <div class="card-body" id="weakTopics">
+            <div style="font-size:13px;color:#94a3b8">No weak topics identified yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Recommendations -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <span class="card-title">🤖 AI-Powered Recommendations</span>
+        <span class="badge-primary">Personalised</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3" id="aiRecommendations">
+          <div style="text-align:center;color:#94a3b8;padding:20px;font-size:13px"><i class="fas fa-spinner fa-spin"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.getElementById('sidebarMount').innerHTML = getSidebarHTML('progress');
+  document.getElementById('navbarMount').innerHTML = getTopNavbarHTML('Progress');
+  if (!Auth.requireAuth()) {}
+
+  async function loadProgress() {
+    const [progRes, subRes, recRes, quizStats] = await Promise.all([
+      api.get('/progress'),
+      api.get('/subjects'),
+      api.get('/ai/recommendations'),
+      api.get('/quiz/stats')
+    ]);
+
+    if (progRes?.success) {
+      const p = progRes.progress;
+      document.getElementById('totalHours').textContent = (p.totalStudyHours||0).toFixed(1);
+      document.getElementById('streak').textContent = p.currentStreak || 0;
+      document.getElementById('longestStreak').textContent = p.longestStreak || 0;
+      document.getElementById('avgScore').textContent = (p.avgQuizScore||0) + '%';
+      document.getElementById('quizCount').textContent = p.totalQuizzesTaken || 0;
+      renderWeeklyChart(p.dailyLogs || []);
+    } else {
+      renderWeeklyChart([]);
+    }
+
+    if (quizStats?.success) {
+      renderQuizChart(quizStats.subjectStats || []);
+    } else {
+      renderQuizChart([]);
+    }
+
+    if (subRes?.success) renderSubjectProgress(subRes.subjects);
+    if (recRes?.success) renderRecommendations(recRes.recommendations);
+  }
+
+  function renderWeeklyChart(logs) {
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const data = logs.length ? logs.slice(-7).map(l => l.studyHours || 0) : [2, 3.5, 1.5, 4, 2.5, 3, 1];
+    while (data.length < 7) data.unshift(0);
+    new Chart(document.getElementById('weeklyChart'), {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Study Hours', data: data.slice(-7),
+          borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,.1)',
+          borderWidth: 2.5, fill: true, tension: .4, pointBackgroundColor: '#4f46e5', pointRadius: 5
+        }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } } }
+    });
+  }
+
+  function renderQuizChart(stats) {
+    const mockStats = stats.length ? stats : [
+      { subject: 'Data Structures', avgScore: 72 }, { subject: 'DBMS', avgScore: 85 },
+      { subject: 'OS', avgScore: 68 }, { subject: 'CN', avgScore: 79 }
+    ];
+    new Chart(document.getElementById('quizChart'), {
+      type: 'bar',
+      data: {
+        labels: mockStats.map(s => s.subject.length > 12 ? s.subject.substring(0,12)+'...' : s.subject),
+        datasets: [{ label: 'Avg Score', data: mockStats.map(s => s.avgScore),
+          backgroundColor: ['rgba(79,70,229,.7)','rgba(16,185,129,.7)','rgba(245,158,11,.7)','rgba(239,68,68,.7)','rgba(6,182,212,.7)','rgba(124,58,237,.7)'],
+          borderRadius: 6 }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%', font: { size: 11 } }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } } }
+    });
+  }
+
+  function renderSubjectProgress(subjects) {
+    const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4'];
+    const totalTopics = subjects.reduce((s, sub) => s + (sub.totalTopics || 0), 0);
+    const completedTopics = subjects.reduce((s, sub) => s + (sub.completedTopics || 0), 0);
+    const overall = totalTopics ? Math.round((completedTopics / totalTopics) * 100) : 0;
+    document.getElementById('overallPct').textContent = overall + '%';
+    document.getElementById('overallBar').style.width = overall + '%';
+
+    document.getElementById('subjectBars').innerHTML = subjects.map((s, i) => `
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1">
+          <span style="font-size:13px;font-weight:600">${s.name}</span>
+          <span style="font-size:12px;color:#64748b">${s.progress || 0}%</span>
+        </div>
+        <div class="progress-bar-custom" style="height:6px">
+          <div class="progress-fill" style="width:${s.progress||0}%;background:${s.color||colors[i%6]}"></div>
+        </div>
+      </div>`).join('');
+
+    // Strong topics: subjects with >70% progress
+    const strong = subjects.filter(s => (s.progress||0) >= 70).map(s => s.name);
+    const weak = subjects.filter(s => (s.progress||0) < 40).map(s => s.name);
+    
+    document.getElementById('strongTopics').innerHTML = strong.length
+      ? strong.map(t => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><i class="fas fa-check-circle" style="color:#10b981"></i>${t}</div>`).join('')
+      : '<div style="font-size:13px;color:#94a3b8">Complete more topics to see strong areas</div>';
+    
+    document.getElementById('weakTopics').innerHTML = weak.length
+      ? weak.map(t => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><i class="fas fa-exclamation-circle" style="color:#ef4444"></i>${t}</div>`).join('')
+      : '<div style="font-size:13px;color:#10b981">Great! No weak subjects identified</div>';
+  }
+
+  function renderRecommendations(recs) {
+    const el = document.getElementById('aiRecommendations');
+    el.innerHTML = `
+      <div class="col-md-3">
+        <div style="background:#f0f0ff;border-radius:12px;padding:16px">
+          <div style="font-weight:700;font-size:13px;color:#4f46e5;margin-bottom:10px"><i class="fas fa-redo"></i> Revise These</div>
+          ${(recs.topicsToRevise||[]).slice(0,4).map(t=>`<div style="font-size:12px;padding:4px 0;color:#334155">• ${t}</div>`).join('')}
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div style="background:#f0fdf4;border-radius:12px;padding:16px">
+          <div style="font-weight:700;font-size:13px;color:#10b981;margin-bottom:10px"><i class="fas fa-arrow-right"></i> Learn Next</div>
+          ${(recs.topicsToLearnNext||[]).slice(0,4).map(t=>`<div style="font-size:12px;padding:4px 0;color:#334155">• ${t}</div>`).join('')}
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div style="background:#fffbf0;border-radius:12px;padding:16px">
+          <div style="font-weight:700;font-size:13px;color:#f59e0b;margin-bottom:10px"><i class="fas fa-question-circle"></i> Suggested Quizzes</div>
+          ${(recs.suggestedQuizzes||[]).slice(0,3).map(q=>`<div style="font-size:12px;padding:4px 0;color:#334155">• ${q.subject}: ${q.topic}</div>`).join('')}
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div style="background:#fff0f0;border-radius:12px;padding:16px">
+          <div style="font-weight:700;font-size:13px;color:#ef4444;margin-bottom:10px"><i class="fas fa-lightbulb"></i> Study Tips</div>
+          ${(recs.studyTips||[]).slice(0,3).map(t=>`<div style="font-size:12px;padding:4px 0;color:#334155">• ${t}</div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { fillUserInfo(); loadProgress(); });
+</script>
+</body>
+</html>

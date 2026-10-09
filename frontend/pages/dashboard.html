@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="sidebarMount"></div>
+
+<div class="main-wrapper">
+  <div id="navbarMount"></div>
+  <div class="page-content">
+
+    <!-- Welcome -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+      <div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Good morning, <span id="userName">Student</span>! 👋</h2>
+        <p style="color:#64748b;font-size:14px;margin:0">Ready to learn something amazing today?</p>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <div style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:white;padding:8px 16px;border-radius:99px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px">
+          <i class="fas fa-fire"></i> <span id="streak">0</span> Day Streak
+        </div>
+        <a href="ai-tutor.html" class="btn-primary"><i class="fas fa-robot"></i> Ask AI</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid-4 mb-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(79,70,229,.1);color:#4f46e5"><i class="fas fa-clock"></i></div>
+        <div class="stat-value text-gradient" id="studyHours">0</div>
+        <div class="stat-label">Total Study Hours</div>
+        <div class="stat-change up"><i class="fas fa-arrow-up"></i> Keep it up!</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,.1);color:#10b981"><i class="fas fa-trophy"></i></div>
+        <div class="stat-value" style="color:#10b981" id="avgScore">0%</div>
+        <div class="stat-label">Avg Quiz Score</div>
+        <div class="stat-change up"><i class="fas fa-arrow-up"></i> Improving</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fas fa-tasks"></i></div>
+        <div class="stat-value" style="color:#f59e0b" id="totalQuizzes">0</div>
+        <div class="stat-label">Quizzes Completed</div>
+        <div class="stat-change up"><i class="fas fa-arrow-up"></i> Practice more</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(239,68,68,.1);color:#ef4444"><i class="fas fa-book-open"></i></div>
+        <div class="stat-value" style="color:#ef4444" id="topicsCompleted">0</div>
+        <div class="stat-label">Topics Completed</div>
+        <div class="stat-change up"><i class="fas fa-arrow-up"></i> Great progress</div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Quick Actions -->
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title">⚡ Quick Actions</span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-6 col-md-4">
+                <a href="ai-tutor.html" style="text-decoration:none">
+                  <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:12px;padding:20px;text-align:center;color:white;transition:all .2s;cursor:pointer" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                    <i class="fas fa-robot" style="font-size:28px;margin-bottom:8px;display:block"></i>
+                    <div style="font-size:13px;font-weight:700">Ask AI Tutor</div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-4">
+                <a href="notes.html" style="text-decoration:none">
+                  <div style="background:linear-gradient(135deg,#10b981,#06b6d4);border-radius:12px;padding:20px;text-align:center;color:white;transition:all .2s;cursor:pointer" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                    <i class="fas fa-file-alt" style="font-size:28px;margin-bottom:8px;display:block"></i>
+                    <div style="font-size:13px;font-weight:700">Summarize Notes</div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-4">
+                <a href="quiz.html" style="text-decoration:none">
+                  <div style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;padding:20px;text-align:center;color:white;transition:all .2s;cursor:pointer" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                    <i class="fas fa-question-circle" style="font-size:28px;margin-bottom:8px;display:block"></i>
+                    <div style="font-size:13px;font-weight:700">Generate Quiz</div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-4">
+                <a href="flashcards.html" style="text-decoration:none">
+                  <div style="background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:12px;padding:20px;text-align:center;color:white;transition:all .2s;cursor:pointer" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                    <i class="fas fa-layer-group" style="font-size:28px;margin-bottom:8px;display:block"></i>
+                    <div style="font-size:13px;font-weight:700">Flashcards</div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-4">
+                <a href="planner.html" style="text-decoration:none">
+                  <div style="background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:12px;padding:20px;text-align:center;color:white;transition:all .2s;cursor:pointer" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                    <i class="fas fa-calendar-alt" style="font-size:28px;margin-bottom:8px;display:block"></i>
+                    <div style="font-size:13px;font-weight:700">Study Planner</div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-4">
+                <a href="progress.html" style="text-decoration:none">
+                  <div style="background:linear-gradient(135deg,#06b6d4,#3b82f6);border-radius:12px;padding:20px;text-align:center;color:white;transition:all .2s;cursor:pointer" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                    <i class="fas fa-chart-line" style="font-size:28px;margin-bottom:8px;display:block"></i>
+                    <div style="font-size:13px;font-weight:700">View Progress</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Progress -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📚 Subject Progress</span>
+            <a href="subjects.html" style="font-size:13px;color:#4f46e5;text-decoration:none">View All</a>
+          </div>
+          <div class="card-body" id="subjectProgress">
+            <div style="text-align:center;padding:20px;color:#94a3b8"><i class="fas fa-spinner fa-spin"></i> Loading subjects...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar widgets -->
+      <div class="col-lg-4">
+        <!-- Today's Plan -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title">📅 Today's Plan</span>
+            <a href="planner.html" style="font-size:13px;color:#4f46e5;text-decoration:none">Open</a>
+          </div>
+          <div class="card-body" id="todayPlan">
+            <div class="empty-state" style="padding:20px">
+              <i class="fas fa-calendar-check" style="font-size:32px;color:#cbd5e1;margin-bottom:10px;display:block"></i>
+              <p style="font-size:13px;color:#94a3b8;margin:0">No tasks for today.<br><a href="planner.html" style="color:#4f46e5">Create a study plan</a></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Recommendations -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title">🤖 AI Recommendations</span>
+          </div>
+          <div class="card-body" id="aiRecs">
+            <div style="text-align:center;padding:10px;color:#94a3b8;font-size:13px"><i class="fas fa-spinner fa-spin"></i></div>
+          </div>
+        </div>
+
+        <!-- Weekly chart -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">📊 Weekly Study Hours</span></div>
+          <div class="card-body"><canvas id="weeklyChart" height="180"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <span class="card-title">🕐 Recent Activity</span>
+      </div>
+      <div class="card-body" id="recentActivity">
+        <div style="text-align:center;padding:20px;color:#94a3b8;font-size:14px">
+          <i class="fas fa-history" style="font-size:32px;color:#cbd5e1;display:block;margin-bottom:8px"></i>
+          No recent activity. Start studying to track your progress!
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.getElementById('sidebarMount').innerHTML = getSidebarHTML('dashboard');
+  document.getElementById('navbarMount').innerHTML = getTopNavbarHTML('Dashboard');
+
+  if (!Auth.requireAuth()) {}
+
+  // Dynamic greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.querySelector('h2').innerHTML = document.querySelector('h2').innerHTML.replace('Good morning', greeting);
+
+  const user = Auth.getUser();
+  if (user) {
+    document.getElementById('userName').textContent = user.name?.split(' ')[0] || 'Student';
+    document.getElementById('streak').textContent = user.studyStreak || 0;
+  }
+
+  async function loadDashboard() {
+    // Load progress
+    const progRes = await api.get('/progress');
+    if (progRes?.success) {
+      const p = progRes.progress;
+      document.getElementById('studyHours').textContent = (p.totalStudyHours || 0).toFixed(1);
+      document.getElementById('avgScore').textContent = (p.avgQuizScore || 0) + '%';
+      document.getElementById('totalQuizzes').textContent = p.totalQuizzesTaken || 0;
+      document.getElementById('streak').textContent = p.currentStreak || 0;
+      renderWeeklyChart(p.dailyLogs || []);
+    } else {
+      renderWeeklyChart([]);
+    }
+
+    // Load subjects
+    const subRes = await api.get('/subjects');
+    if (subRes?.success) {
+      let total = 0;
+      subRes.subjects.forEach(s => total += s.completedTopics || 0);
+      document.getElementById('topicsCompleted').textContent = total;
+      renderSubjectProgress(subRes.subjects);
+    }
+
+    // Load AI recommendations
+    const recRes = await api.get('/ai/recommendations');
+    if (recRes?.success) renderRecommendations(recRes.recommendations);
+  }
+
+  function renderSubjectProgress(subjects) {
+    const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4'];
+    const el = document.getElementById('subjectProgress');
+    if (!subjects.length) { el.innerHTML = '<p style="color:#94a3b8;text-align:center">No subjects found. <a href="subjects.html">Add subjects</a></p>'; return; }
+    el.innerHTML = subjects.map((s, i) => `
+      <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fas ${s.icon}" style="color:${s.color || colors[i%6]};width:16px"></i>
+            <span style="font-size:14px;font-weight:600">${s.name}</span>
+          </div>
+          <span style="font-size:13px;color:#64748b">${s.completedTopics||0}/${s.totalTopics||0} topics</span>
+        </div>
+        <div class="progress-bar-custom">
+          <div class="progress-fill" style="width:${s.progress||0}%;background:${s.color||colors[i%6]}"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderRecommendations(recs) {
+    const el = document.getElementById('aiRecs');
+    const tips = recs.studyTips || ['Review Data Structures daily', 'Practice SQL queries', 'Focus on OS scheduling algorithms'];
+    el.innerHTML = `
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:#4f46e5;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Topics to Revise</div>
+        ${(recs.topicsToRevise||[]).slice(0,3).map(t => `<div style="font-size:13px;padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px"><i class="fas fa-redo" style="color:#f59e0b;font-size:12px"></i>${t}</div>`).join('')}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Study Tips</div>
+        ${tips.slice(0,2).map(t => `<div style="font-size:13px;padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;gap:8px"><i class="fas fa-lightbulb" style="color:#10b981;font-size:12px;margin-top:2px"></i>${t}</div>`).join('')}
+      </div>
+    `;
+  }
+
+  function renderWeeklyChart(logs) {
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const data = Array(7).fill(0);
+    if (logs && logs.length) {
+      const now = new Date();
+      logs.slice(-7).forEach((l, i) => { data[i] = l.studyHours || 0; });
+    } else {
+      // Mock data
+      [2, 3.5, 1.5, 4, 2.5, 3, 1].forEach((v,i) => data[i] = v);
+    }
+    new Chart(document.getElementById('weeklyChart'), {
+      type: 'bar',
+      data: {
+        labels: days,
+        datasets: [{ data, backgroundColor: 'rgba(79,70,229,.2)', borderColor: '#4f46e5', borderWidth: 2, borderRadius: 6 }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } }
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { fillUserInfo(); loadDashboard(); });
+</script>
+</body>
+</html>

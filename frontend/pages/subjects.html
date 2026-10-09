@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subjects — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="sidebarMount"></div>
+<div class="main-wrapper">
+  <div id="navbarMount"></div>
+  <div class="page-content">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+      <div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">📚 Subjects</h2>
+        <p style="color:#64748b;font-size:14px;margin:0">Manage your B.Tech CSE subjects and track topic completion</p>
+      </div>
+      <button class="btn-primary" onclick="showAddSubjectModal()"><i class="fas fa-plus"></i> Add Subject</button>
+    </div>
+
+    <div id="subjectsGrid" class="row g-4">
+      <div class="col-12" style="text-align:center;padding:40px;color:#94a3b8"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- Subject Detail Sidebar -->
+<div id="subjectDetailPanel" style="position:fixed;top:0;right:-400px;width:400px;height:100vh;background:white;box-shadow:-4px 0 24px rgba(0,0,0,.1);z-index:1001;transition:right .3s ease;overflow-y:auto">
+  <div style="padding:20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+    <h3 id="detailTitle" style="font-size:18px;font-weight:800;margin:0"></h3>
+    <button onclick="closeDetail()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">×</button>
+  </div>
+  <div style="padding:20px">
+    <div id="detailProgress" style="margin-bottom:20px"></div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px">Topics</div>
+    <div id="topicsList"></div>
+    <div style="margin-top:16px">
+      <div class="d-flex gap-2">
+        <input type="text" id="newTopicInput" class="form-control" placeholder="Add new topic...">
+        <button class="btn-primary" onclick="addTopic()" style="padding:8px 14px;white-space:nowrap"><i class="fas fa-plus"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="detailOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1000" onclick="closeDetail()"></div>
+
+<!-- Add Subject Modal -->
+<div class="modal fade" id="addSubjectModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Add New Subject</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Subject Name *</label>
+          <input type="text" id="newSubjectName" class="form-control" placeholder="e.g., Machine Learning">
+        </div>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label">Subject Code</label>
+            <input type="text" id="newSubjectCode" class="form-control" placeholder="e.g., ML">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Color</label>
+            <input type="color" id="newSubjectColor" class="form-control" value="#4f46e5" style="height:42px;padding:4px">
+          </div>
+        </div>
+        <div class="form-group mt-3">
+          <label class="form-label">Topics (one per line)</label>
+          <textarea id="newSubjectTopics" class="form-control" rows="5" placeholder="Introduction&#10;Basics&#10;Advanced Concepts&#10;Applications"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-primary" onclick="addSubject()"><i class="fas fa-plus"></i> Add Subject</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.getElementById('sidebarMount').innerHTML = getSidebarHTML('subjects');
+  document.getElementById('navbarMount').innerHTML = getTopNavbarHTML('Subjects');
+  if (!Auth.requireAuth()) {}
+
+  let allSubjects = [], currentSubjectId = null;
+
+  const subjectIcons = { 'Data Structures': 'fa-sitemap', 'DBMS': 'fa-database', 'Operating Systems': 'fa-server', 'Computer Networks': 'fa-network-wired', 'Python Programming': 'fa-python', 'Mathematics': 'fa-calculator' };
+
+  async function loadSubjects() {
+    const res = await api.get('/subjects');
+    if (res?.success) { allSubjects = res.subjects; renderSubjects(); }
+  }
+
+  function renderSubjects() {
+    const el = document.getElementById('subjectsGrid');
+    if (!allSubjects.length) {
+      el.innerHTML = '<div class="col-12"><div class="empty-state"><i class="fas fa-book"></i><h3>No Subjects Found</h3><p>Add your B.Tech CSE subjects to get started</p></div></div>';
+      return;
+    }
+    el.innerHTML = allSubjects.map(s => `
+      <div class="col-md-6 col-lg-4">
+        <div class="subject-card" style="cursor:pointer" onclick="openDetail('${s._id}')">
+          <div class="subject-header">
+            <div class="subject-icon" style="background:${s.color}22;color:${s.color}">
+              <i class="fas ${s.icon || subjectIcons[s.name] || 'fa-book'}"></i>
+            </div>
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h3 style="font-size:16px;font-weight:800;margin-bottom:2px">${s.name}</h3>
+                <div style="font-size:12px;color:#94a3b8">${s.code || ''} · ${s.totalTopics || 0} topics</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button onclick="event.stopPropagation();deleteSubject('${s._id}')" style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:14px" title="Delete"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span style="font-size:12px;color:#64748b">${s.completedTopics||0} of ${s.totalTopics||0} topics</span>
+                <span style="font-size:13px;font-weight:700;color:${s.color}">${s.progress||0}%</span>
+              </div>
+              <div class="progress-bar-custom">
+                <div class="progress-fill" style="width:${s.progress||0}%;background:${s.color}"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+              <a href="quiz.html" onclick="event.stopPropagation()" class="btn-outline" style="padding:5px 12px;font-size:12px;text-decoration:none"><i class="fas fa-question-circle"></i> Quiz</a>
+              <a href="flashcards.html" onclick="event.stopPropagation()" class="btn-outline" style="padding:5px 12px;font-size:12px;text-decoration:none"><i class="fas fa-layer-group"></i> Cards</a>
+              <a href="ai-tutor.html" onclick="event.stopPropagation()" class="btn-outline" style="padding:5px 12px;font-size:12px;text-decoration:none"><i class="fas fa-robot"></i> Ask AI</a>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function openDetail(id) {
+    const sub = allSubjects.find(s => s._id === id);
+    if (!sub) return;
+    currentSubjectId = id;
+    document.getElementById('detailTitle').textContent = sub.name;
+    document.getElementById('detailProgress').innerHTML = `
+      <div class="d-flex justify-content-between mb-2"><span style="font-size:14px;font-weight:600">Progress</span><span style="color:${sub.color};font-weight:700">${sub.progress||0}%</span></div>
+      <div class="progress-bar-custom" style="height:10px"><div class="progress-fill" style="width:${sub.progress||0}%;background:${sub.color}"></div></div>
+      <div style="font-size:12px;color:#64748b;margin-top:6px">${sub.completedTopics||0} of ${sub.totalTopics||0} topics completed</div>`;
+    renderTopics(sub.topics || []);
+    document.getElementById('subjectDetailPanel').style.right = '0';
+    document.getElementById('detailOverlay').style.display = 'block';
+  }
+
+  function renderTopics(topics) {
+    const el = document.getElementById('topicsList');
+    el.innerHTML = topics.map(t => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:6px">
+        <input type="checkbox" ${t.completed ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer;accent-color:#4f46e5" onchange="toggleTopic('${t._id}', this.checked)">
+        <span style="flex:1;font-size:13px;${t.completed ? 'text-decoration:line-through;color:#94a3b8' : 'color:#334155'}">${t.name}</span>
+        ${t.completed ? `<span style="font-size:10px;color:#10b981"><i class="fas fa-check-circle"></i></span>` : ''}
+      </div>`).join('');
+  }
+
+  async function toggleTopic(topicId, completed) {
+    const res = await api.patch(`/subjects/${currentSubjectId}/topics/${topicId}/toggle`);
+    if (res?.success) {
+      const idx = allSubjects.findIndex(s => s._id === currentSubjectId);
+      if (idx >= 0) { allSubjects[idx] = res.subject; openDetail(currentSubjectId); renderSubjects(); }
+    }
+  }
+
+  async function addTopic() {
+    const name = document.getElementById('newTopicInput').value.trim();
+    if (!name) return;
+    const res = await api.post(`/subjects/${currentSubjectId}/topics`, { name });
+    if (res?.success) {
+      const idx = allSubjects.findIndex(s => s._id === currentSubjectId);
+      if (idx >= 0) { allSubjects[idx] = res.subject; openDetail(currentSubjectId); renderSubjects(); }
+      document.getElementById('newTopicInput').value = '';
+      Toast.show('Topic added!', 'success');
+    }
+  }
+
+  async function addSubject() {
+    const name = document.getElementById('newSubjectName').value.trim();
+    if (!name) { Toast.show('Subject name is required', 'warning'); return; }
+    const topics = document.getElementById('newSubjectTopics').value.split('\n').filter(t => t.trim());
+    const res = await api.post('/subjects', {
+      name, code: document.getElementById('newSubjectCode').value,
+      color: document.getElementById('newSubjectColor').value,
+      icon: subjectIcons[name] || 'fa-book', topics
+    });
+    if (res?.success) {
+      allSubjects.push(res.subject); renderSubjects();
+      bootstrap.Modal.getInstance(document.getElementById('addSubjectModal')).hide();
+      Toast.show('Subject added!', 'success');
+    }
+  }
+
+  async function deleteSubject(id) {
+    if (!confirm('Delete this subject? This cannot be undone.')) return;
+    const res = await api.delete(`/subjects/${id}`);
+    if (res?.success) { allSubjects = allSubjects.filter(s => s._id !== id); renderSubjects(); Toast.show('Subject deleted', 'info'); }
+  }
+
+  function closeDetail() { document.getElementById('subjectDetailPanel').style.right = '-400px'; document.getElementById('detailOverlay').style.display = 'none'; }
+  function showAddSubjectModal() { new bootstrap.Modal(document.getElementById('addSubjectModal')).show(); }
+
+  document.addEventListener('DOMContentLoaded', () => { fillUserInfo(); loadSubjects(); });
+</script>
+</body>
+</html>

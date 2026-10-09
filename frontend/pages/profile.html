@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — AI Study Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="sidebarMount"></div>
+<div class="main-wrapper">
+  <div id="navbarMount"></div>
+  <div class="page-content">
+    <div class="row g-4">
+      <!-- Profile Card -->
+      <div class="col-lg-4">
+        <div class="card" style="overflow:visible">
+          <div class="profile-cover"></div>
+          <div style="padding:48px 20px 20px;position:relative">
+            <div class="profile-avatar-wrapper" style="position:absolute;top:-40px;left:20px">
+              <div class="profile-avatar" id="profileAvatarBig">S</div>
+            </div>
+            <h2 style="font-size:20px;font-weight:800;margin-bottom:4px" id="profileName">Student</h2>
+            <div style="font-size:14px;color:#64748b;margin-bottom:12px" id="profileEmail">student@email.com</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+              <span class="badge-primary" id="profileBranch">B.Tech CSE</span>
+              <span class="badge-success" id="profileSemester">Semester</span>
+              <span class="badge-warning" id="profileCollege">College</span>
+            </div>
+            <div style="border-top:1px solid #f1f5f9;padding-top:16px">
+              <div class="row g-3 text-center">
+                <div class="col-4"><div style="font-size:22px;font-weight:800;color:#4f46e5" id="statStreak">0</div><div style="font-size:11px;color:#94a3b8">Day Streak</div></div>
+                <div class="col-4"><div style="font-size:22px;font-weight:800;color:#10b981" id="statHours">0</div><div style="font-size:11px;color:#94a3b8">Study Hours</div></div>
+                <div class="col-4"><div style="font-size:22px;font-weight:800;color:#f59e0b" id="statQuizzes">0</div><div style="font-size:11px;color:#94a3b8">Quizzes</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="card mt-4">
+          <div class="card-header"><span class="card-title">🏆 Achievements</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:10px">
+                <div style="font-size:28px">🔥</div><div style="font-size:12px;font-weight:600;margin-top:4px">7-Day Streak</div>
+              </div>
+              <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:10px">
+                <div style="font-size:28px">🎯</div><div style="font-size:12px;font-weight:600;margin-top:4px">Quiz Master</div>
+              </div>
+              <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:10px">
+                <div style="font-size:28px">📚</div><div style="font-size:12px;font-weight:600;margin-top:4px">Note Taker</div>
+              </div>
+              <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:10px;opacity:.3">
+                <div style="font-size:28px">🚀</div><div style="font-size:12px;font-weight:600;margin-top:4px">Rocket Start</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Profile -->
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title">✏️ Edit Profile</span>
+          </div>
+          <div class="card-body">
+            <form id="profileForm">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" id="editName" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email (read-only)</label>
+                  <input type="email" id="editEmail" class="form-control" readonly style="background:#f8fafc">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">College / University</label>
+                  <input type="text" id="editCollege" class="form-control">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Semester</label>
+                  <select id="editSemester" class="form-control">
+                    <option value="">Select semester</option>
+                    <option>1st Semester</option><option>2nd Semester</option>
+                    <option>3rd Semester</option><option>4th Semester</option>
+                    <option>5th Semester</option><option>6th Semester</option>
+                    <option>7th Semester</option><option>8th Semester</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Daily Study Goal (hours)</label>
+                  <input type="number" id="editStudyGoal" class="form-control" min="1" max="12" value="4">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Default Difficulty</label>
+                  <select id="editDifficulty" class="form-control">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate" selected>Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔐 Change Password</span></div>
+          <div class="card-body">
+            <form id="passwordForm">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Current Password</label>
+                  <input type="password" id="currentPw" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">New Password</label>
+                  <input type="password" id="newPw" class="form-control" required minlength="6">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Confirm New Password</label>
+                  <input type="password" id="confirmPw" class="form-control" required>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button type="submit" class="btn-primary"><i class="fas fa-key"></i> Change Password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.getElementById('sidebarMount').innerHTML = getSidebarHTML('profile');
+  document.getElementById('navbarMount').innerHTML = getTopNavbarHTML('Profile');
+  if (!Auth.requireAuth()) {}
+
+  async function loadProfile() {
+    const [userRes, progRes] = await Promise.all([api.get('/auth/me'), api.get('/progress')]);
+
+    if (userRes?.success) {
+      const u = userRes.user;
+      document.getElementById('profileName').textContent = u.name;
+      document.getElementById('profileEmail').textContent = u.email;
+      document.getElementById('profileAvatarBig').textContent = u.name.charAt(0).toUpperCase();
+      document.getElementById('profileBranch').textContent = u.branch || 'B.Tech CSE';
+      document.getElementById('profileSemester').textContent = u.semester || 'N/A';
+      document.getElementById('profileCollege').textContent = u.college || 'College';
+      document.getElementById('profileCollege').textContent = (u.college || 'N/A').substring(0, 20);
+      document.getElementById('statStreak').textContent = u.studyStreak || 0;
+      // Prefill form
+      document.getElementById('editName').value = u.name;
+      document.getElementById('editEmail').value = u.email;
+      document.getElementById('editCollege').value = u.college || '';
+      document.getElementById('editSemester').value = u.semester || '';
+      document.getElementById('editStudyGoal').value = u.studyGoal || 4;
+      document.getElementById('editDifficulty').value = u.preferences?.difficulty || 'intermediate';
+    }
+
+    if (progRes?.success) {
+      const p = progRes.progress;
+      document.getElementById('statHours').textContent = (p.totalStudyHours||0).toFixed(0);
+      document.getElementById('statQuizzes').textContent = p.totalQuizzesTaken || 0;
+    }
+  }
+
+  document.getElementById('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const res = await api.put('/auth/profile', {
+      name: document.getElementById('editName').value,
+      college: document.getElementById('editCollege').value,
+      semester: document.getElementById('editSemester').value,
+      studyGoal: parseInt(document.getElementById('editStudyGoal').value),
+      preferences: { difficulty: document.getElementById('editDifficulty').value }
+    });
+    if (res?.success) {
+      const user = Auth.getUser();
+      Auth.setAuth(Auth.getToken(), { ...user, name: res.user.name });
+      Toast.show('Profile updated!', 'success');
+      fillUserInfo();
+    } else {
+      Toast.show(res?.message || 'Update failed', 'error');
+    }
+  });
+
+  document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newPw = document.getElementById('newPw').value;
+    const confirm = document.getElementById('confirmPw').value;
+    if (newPw !== confirm) { Toast.show('Passwords do not match', 'error'); return; }
+    const res = await api.put('/auth/change-password', {
+      currentPassword: document.getElementById('currentPw').value,
+      newPassword: newPw
+    });
+    if (res?.success) {
+      Toast.show('Password changed successfully!', 'success');
+      document.getElementById('passwordForm').reset();
+    } else {
+      Toast.show(res?.message || 'Failed to change password', 'error');
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => { fillUserInfo(); loadProfile(); });
+</script>
+</body>
+</html>
